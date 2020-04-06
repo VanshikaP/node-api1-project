@@ -65,7 +65,7 @@ server.post('/api/users', (req, res) => {
         }
         users.push(newUser)
         if (users.find(u => u.id == newUser.id)) {
-            res.status(201).json(newUser)
+            res.status(201).json(users)
         } else {
             res.status(500).json({ errorMessage: "There was an error while saving the user to the database" })
         }
@@ -84,6 +84,44 @@ server.delete('/api/users/:id', (req, res) => {
             users = users.filter(u => u !== currUser);
             res.status(201).json(currUser);
         }
+    }
+})
+
+server.put('/api/users/:id', (req, res) => {
+    const id = req.params.id
+    const userUpdate = req.body;
+    if (users == undefined) {
+        res.status(500).json({ errorMessage: "The user information could not be modified." })
+    } else {
+        if(!userUpdate.hasOwnProperty('name') || !userUpdate.hasOwnProperty('bio')) {
+            res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+        } else {
+            // users.map(u => {
+            //     if (u.id == id) {
+            //         return {
+            //             id: u.id,
+            //             // ...userUpdate
+            //             name: 'New',
+            //             bio: "New bio"
+            //         }
+            //     }
+            // })
+            for(let i = 0; i < users.length; i++){
+                if (users[i].id == id){
+                    users[i].name = userUpdate.name
+                    users[i].bio = userUpdate.bio
+                }
+            }
+            const user = users.find(u => u.id == id);
+            if (user) {
+                res.status(200).json(users)
+            } else {
+                res.status(404).json({
+                    message: "The user with the specified ID does not exist."
+                })
+            }
+        }
+        
     }
 })
 
