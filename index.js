@@ -33,18 +33,42 @@ server.get('/', (req, res) => {
 })
 
 server.get('/api/users', (req,res) => {
-    res.json(users);
+    users == undefined 
+    ? res.status(500).json({ errorMessage: "The users information could not be retrieved." }) 
+    : res.json(users)
 })
 
 server.get('/api/users/:id', (req,res) => {
     const id = req.params.id
-    const user = users.find(u => u.id == id);
-    if (user) {
-        res.status(201).json(user)
+    if (users == undefined) {
+        res.status(500).json({ errorMessage: "The user information could not be retrieved." })
     } else {
-        res.status(404).json({
-            error: 'User not found'
-        })
+        const user = users.find(u => u.id == id);
+        if (user) {
+            res.status(201).json(user)
+        } else {
+            res.status(404).json({
+                message: "The user with the specified ID does not exist."
+            })
+        }
+    }
+})
+
+server.post('/api/users', (req, res) => {
+    const userInfo = req.body;
+    if (!userInfo.hasOwnProperty('name') || !userInfo.hasOwnProperty('bio')) {
+        res.status(400).json({ errorMessage: 'Please provide name and bio for the user.' })
+    } else {
+        const newUser = {
+            id: shortid.generate(),
+            ...userInfo
+        }
+        users.push(newUser)
+        if (users.find(u => u.id == newUser.id)) {
+            res.status(201).json(newUser)
+        } else {
+            res.status(500).json({ errorMessage: "There was an error while saving the user to the database" })
+        }
     }
 })
 
