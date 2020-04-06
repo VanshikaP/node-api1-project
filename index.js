@@ -72,5 +72,20 @@ server.post('/api/users', (req, res) => {
     }
 })
 
+server.delete('/api/users/:id', (req, res) => {
+    if (users == undefined){
+        res.status(500).json({ errorMessage: "The user could not be removed" })
+    } else {
+        const id = req.params.id;
+        const currUser = users.find(u => u.id == id);
+        if (currUser == undefined) {
+            res.status(404).json({ message: "The user with the specified ID does not exist." })
+        } else {
+            users = users.filter(u => u !== currUser);
+            res.status(201).json(currUser);
+        }
+    }
+})
+
 const port = 3000;
 server.listen(port, () => console.log(`\n --- Server running on ${port} ---\n`))
