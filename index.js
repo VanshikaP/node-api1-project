@@ -1,10 +1,12 @@
 const express = require('express')
+const cors = require('cors');
 const shortid = require('shortid')
 
 const server = express()
 
 //middleware
 server.use(express.json())
+server.use(cors());
 
 let users = [
     {
